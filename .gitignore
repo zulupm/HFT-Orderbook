@@ -92,6 +92,8 @@ ENV/
 # Zig build artifacts
 zig-cache/
 zig-out/
+# ImGui runtime config
+imgui.ini
 # Spyder project settings
 .spyderproject
 

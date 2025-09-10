@@ -19,10 +19,17 @@ static double now(void) {
 }
 #endif
 
-void run_benchmark(long iterations) {
+typedef struct {
+    double latency_us;
+    double throughput;
+    double elapsed;
+} BenchmarkResult;
+
+BenchmarkResult run_benchmark(long iterations) {
+    BenchmarkResult result = {0};
     if (iterations <= 0) {
         printf("Invalid iteration count.\n");
-        return;
+        return result;
     }
 
     Limit limit;
@@ -40,10 +47,17 @@ void run_benchmark(long iterations) {
     }
     double end = now();
 
-    double elapsed = end - start;
-    double latency_us = (elapsed / iterations) * 1e6;
-    double throughput = iterations / elapsed;
-    printf("Performed %ld operations in %f seconds\n", iterations, elapsed);
-    printf("Average latency per operation: %.3f microseconds\n", latency_us);
-    printf("Throughput: %.3f ops/sec\n", throughput);
+    result.elapsed = end - start;
+    result.latency_us = (result.elapsed / iterations) * 1e6;
+    result.throughput = iterations / result.elapsed;
+    return result;
+}
+
+void print_benchmark(long iterations) {
+    BenchmarkResult r = run_benchmark(iterations);
+    if (r.elapsed > 0) {
+        printf("Performed %ld operations in %f seconds\n", iterations, r.elapsed);
+        printf("Average latency per operation: %.3f microseconds\n", r.latency_us);
+        printf("Throughput: %.3f ops/sec\n", r.throughput);
+    }
 }

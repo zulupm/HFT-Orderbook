@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
         "src/utils.c",
     };
 
-    const include_paths = &[_][]const u8{"src"};
+    const include_paths = &[_][]const u8{"src", "thirdparty/imgui", "thirdparty/implot"};
 
     const exe = b.addExecutable(.{
         .name = "HFT_Orderbook",
@@ -29,11 +29,28 @@ pub fn build(b: *std.Build) void {
     exe.addCSourceFile(.{ .file = .{ .path = "src/main.c" }, .flags = &[_][]const u8{} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/benchmark.c" }, .flags = &[_][]const u8{} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/binance.cpp" }, .flags = &[_][]const u8{"-std=c++17"} });
+    exe.addCSourceFile(.{ .file = .{ .path = "src/viz.cpp" }, .flags = &[_][]const u8{"-std=c++17"} });
+    // ImGui sources
+    const imgui_sources = &[_][]const u8{
+        "thirdparty/imgui/imgui.cpp",
+        "thirdparty/imgui/imgui_draw.cpp",
+        "thirdparty/imgui/imgui_tables.cpp",
+        "thirdparty/imgui/imgui_widgets.cpp",
+        "thirdparty/imgui/imgui_impl_sdl2.cpp",
+        "thirdparty/imgui/imgui_impl_sdlrenderer2.cpp",
+    };
+    for (imgui_sources) |s| {
+        exe.addCSourceFile(.{ .file = .{ .path = s }, .flags = &[_][]const u8{"-std=c++17"} });
+    }
+    // ImPlot sources
+    exe.addCSourceFile(.{ .file = .{ .path = "thirdparty/implot/implot.cpp" }, .flags = &[_][]const u8{"-std=c++17"} });
+    exe.addCSourceFile(.{ .file = .{ .path = "thirdparty/implot/implot_items.cpp" }, .flags = &[_][]const u8{"-std=c++17"} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/CuTest.c" }, .flags = &[_][]const u8{} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/testCases.c" }, .flags = &[_][]const u8{} });
     exe.linkLibC();
     exe.linkLibCpp();
     exe.linkSystemLibrary("curl");
+    exe.linkSystemLibrary("SDL2");
     if (link_math) exe.linkSystemLibrary("m");
     b.installArtifact(exe);
 

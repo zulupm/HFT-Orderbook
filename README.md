@@ -28,11 +28,25 @@ The executable can fetch a live ETH/USDT order book snapshot from Binance using
 `libcurl`.
 
 ```
-./build/HFT_Orderbook --binance-snapshot [SYMBOL]
+zig build
+./zig-out/bin/HFT_Orderbook --binance-snapshot [SYMBOL]
 ```
 
 The program prints the top bid and ask from the returned snapshot, verifying
-connectivity to the exchange.
+connectivity to the exchange. A US-hosted endpoint (`api.binance.us`) is used
+to ensure availability from most regions.
+
+## ImPlot GUI
+
+Launch a real-time GUI that visualizes benchmark throughput/latency and live
+Binance bid data using Dear ImGui and ImPlot:
+
+```
+./zig-out/bin/HFT_Orderbook --gui
+```
+
+The window updates once per second with a fresh benchmark sample and snapshot
+of the best bid price and volume.
 
 ## Prebuilt binaries
 
