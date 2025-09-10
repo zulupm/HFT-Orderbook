@@ -9,6 +9,75 @@ Available at Archive.org's WayBackMachine:
 
 https://goo.gl/KF1SRm
 
+## Performance Benchmark
+
+A built-in benchmark reports mean latency and throughput for order operations.
+Build the project and run the benchmark using Zig:
+
+```
+zig build            # builds the unified HFT_Orderbook binary
+zig build benchmark  # executes benchmark with 100000 operations
+```
+
+The benchmark output prints the average time per operation in microseconds and
+the achieved throughput in operations per second.
+
+## Dependencies
+
+The Zig build uses `pkg-config` to discover `libcurl` and `SDL2` on Unix-like
+systems. Make sure the corresponding development packages and `pkg-config` are
+installed (for example, `libcurl4-openssl-dev` and `libsdl2-dev` on
+Debian/Ubuntu) before running `zig build`.
+
+## Binance Order Book Snapshot
+
+The executable can fetch a live ETH/USDT order book snapshot from Binance using
+`libcurl`.
+
+```
+zig build
+./zig-out/bin/HFT_Orderbook --binance-snapshot [SYMBOL]
+```
+
+The program prints the top bid and ask from the returned snapshot, verifying
+connectivity to the exchange. A US-hosted endpoint (`api.binance.us`) is used
+to ensure availability from most regions.
+
+## ImPlot GUI
+
+Launch a real-time GUI that visualizes benchmark throughput/latency and live
+Binance bid data using Dear ImGui and ImPlot:
+
+```
+./zig-out/bin/HFT_Orderbook --gui
+```
+
+The window updates once per second with a fresh benchmark sample and snapshot
+of the best bid price and volume.
+
+## Windows setup
+
+The Windows build expects development headers and libraries for `libcurl` and
+`SDL2`. The GitHub Actions workflow provisions them via
+[vcpkg](https://github.com/microsoft/vcpkg); the same commands can be used
+locally:
+
+```
+git clone https://github.com/microsoft/vcpkg.git
+./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+./vcpkg/vcpkg.exe install curl:x64-windows sdl2:x64-windows
+```
+
+After installation, ensure `vcpkg\installed\x64-windows\bin` is on your
+`PATH` so the resulting `HFT_Orderbook.exe` can locate the required DLLs.
+
+## Prebuilt binaries
+
+Every push and pull request triggers a GitHub Actions workflow that builds the
+project on Linux, macOS and Windows using Zig 0.11.0. The compiled
+`HFT_Orderbook` executable is published as a workflow artifact for easy
+download.
+
 
     "There are three main operations that a limit order book (LOB) has to
     implement: add, cancel, and execute.  The goal is to implement these
