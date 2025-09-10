@@ -24,10 +24,11 @@ the achieved throughput in operations per second.
 
 ## Dependencies
 
-The Zig build uses `pkg-config` to discover `libcurl` and `SDL2` on Unix-like
-systems. Make sure the corresponding development packages and `pkg-config` are
-installed (for example, `libcurl4-openssl-dev` and `libsdl2-dev` on
-Debian/Ubuntu) before running `zig build`.
+The executable statically links `libcurl` and `SDL2` so that the resulting
+binary is portable and does not depend on dynamic libraries at runtime.
+Install development packages that provide static `.a` libraries (for example,
+`libcurl4-openssl-dev` and `libsdl2-dev` on Debian/Ubuntu) before running
+`zig build`.
 
 ## Binance Order Book Snapshot
 
@@ -65,11 +66,12 @@ locally:
 ```
 git clone https://github.com/microsoft/vcpkg.git
 ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
-./vcpkg/vcpkg.exe install curl:x64-windows sdl2:x64-windows
+./vcpkg/vcpkg.exe install curl:x64-windows-static sdl2:x64-windows-static
 ```
 
-After installation, ensure `vcpkg\installed\x64-windows\bin` is on your
-`PATH` so the resulting `HFT_Orderbook.exe` can locate the required DLLs.
+The build script searches `vcpkg/installed/x64-windows-static` for headers and
+libraries. If you install elsewhere, set the `INCLUDE` and `LIB` environment
+variables so Zig can locate the files.
 
 ## Prebuilt binaries
 

@@ -1,5 +1,4 @@
 const std = @import("std");
-const PkgConfig = std.build.PkgConfig;
 
 fn addEnvPaths(b: *std.Build, exe: *std.Build.Step.Compile, env: []const u8, is_lib: bool) void {
     const raw = std.process.getEnvVarOwned(b.allocator, env) catch return;
@@ -63,24 +62,26 @@ pub fn build(b: *std.Build) void {
     exe.linkLibC();
     exe.linkLibCpp();
     if (target.os_tag == .windows) {
+        // Fallback to vcpkg-installed headers and static libraries when present
+        exe.addIncludePath(.{ .path = "vcpkg/installed/x64-windows-static/include" });
+        exe.addLibraryPath(.{ .path = "vcpkg/installed/x64-windows-static/lib" });
         addEnvPaths(b, exe, "INCLUDE", false);
         addEnvPaths(b, exe, "LIB", true);
-        exe.linkSystemLibrary("libcurl");
-        exe.linkSystemLibrary("SDL2");
-        exe.linkSystemLibrary("SDL2main");
+        const opts = .{ .preferred_link_mode = .Static };
+        exe.linkSystemLibrary2("curl", opts);
+        exe.linkSystemLibrary2("SDL2", opts);
+        exe.linkSystemLibrary2("SDL2main", opts);
+        exe.linkSystemLibrary("ws2_32");
+        exe.linkSystemLibrary("crypt32");
+        exe.linkSystemLibrary("bcrypt");
+    } else if (target.os_tag == .macos) {
+        const opts = .{ .preferred_link_mode = .Static };
+        exe.linkSystemLibrary2("curl", opts);
+        exe.linkSystemLibrary2("SDL2", opts);
+        if (link_math) exe.linkSystemLibrary("m");
     } else {
-        const curl_pkg = PkgConfig.find(b, .{ .name = "libcurl" }) catch |err| {
-            std.log.err("libcurl not found: {}", .{err});
-            std.process.exit(1);
-        };
-        curl_pkg.addTo(exe);
-
-        const sdl_pkg = PkgConfig.find(b, .{ .name = "sdl2" }) catch |err| {
-            std.log.err("SDL2 not found: {}", .{err});
-            std.process.exit(1);
-        };
-        sdl_pkg.addTo(exe);
-
+        exe.linkSystemLibrary("curl");
+        exe.linkSystemLibrary("SDL2");
         if (link_math) exe.linkSystemLibrary("m");
     }
     b.installArtifact(exe);
