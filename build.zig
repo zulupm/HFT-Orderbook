@@ -62,9 +62,12 @@ pub fn build(b: *std.Build) void {
     exe.linkLibC();
     exe.linkLibCpp();
     if (target.os_tag == .windows) {
+        // Fallback to vcpkg-installed headers and libraries when present
+        exe.addIncludePath(.{ .path = "vcpkg/installed/x64-windows/include" });
+        exe.addLibraryPath(.{ .path = "vcpkg/installed/x64-windows/lib" });
         addEnvPaths(b, exe, "INCLUDE", false);
         addEnvPaths(b, exe, "LIB", true);
-        exe.linkSystemLibrary("libcurl");
+        exe.linkSystemLibrary("curl");
         exe.linkSystemLibrary("SDL2");
         exe.linkSystemLibrary("SDL2main");
     } else {

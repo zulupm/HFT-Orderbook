@@ -71,6 +71,11 @@ git clone https://github.com/microsoft/vcpkg.git
 After installation, ensure `vcpkg\installed\x64-windows\bin` is on your
 `PATH` so the resulting `HFT_Orderbook.exe` can locate the required DLLs.
 
+The build script also looks for headers and libraries in
+`vcpkg/installed/x64-windows`. Running the above commands from the repository
+root places them where the build expects. If you install elsewhere, set the
+`INCLUDE` and `LIB` environment variables so Zig can locate the files.
+
 ## Prebuilt binaries
 
 Every push and pull request triggers a GitHub Actions workflow that builds the
