@@ -14,6 +14,18 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            sudo apt-get update
+            sudo apt-get install -y libsdl2-dev libcurl4-openssl-dev
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            brew update
+            brew install sdl2 curl
+          else
+            choco install -y sdl2 curl
+          fi
       - name: Install Zig
         uses: mlugg/setup-zig@v1
         with:
