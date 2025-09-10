@@ -24,10 +24,10 @@ the achieved throughput in operations per second.
 
 ## Dependencies
 
-The Zig build uses `pkg-config` to discover `libcurl` and `SDL2` on Unix-like
-systems. Make sure the corresponding development packages and `pkg-config` are
-installed (for example, `libcurl4-openssl-dev` and `libsdl2-dev` on
-Debian/Ubuntu) before running `zig build`.
+The build expects development headers and libraries for `libcurl` and `SDL2`.
+Ensure the appropriate packages are installed (for example,
+`libcurl4-openssl-dev` and `libsdl2-dev` on Debian/Ubuntu) before running
+`zig build`.
 
 ## Binance Order Book Snapshot
 
