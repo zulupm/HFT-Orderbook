@@ -48,6 +48,22 @@ Binance bid data using Dear ImGui and ImPlot:
 The window updates once per second with a fresh benchmark sample and snapshot
 of the best bid price and volume.
 
+## Windows setup
+
+The Windows build expects development headers and libraries for `libcurl` and
+`SDL2`. The GitHub Actions workflow provisions them via
+[vcpkg](https://github.com/microsoft/vcpkg); the same commands can be used
+locally:
+
+```
+git clone https://github.com/microsoft/vcpkg.git
+./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+./vcpkg/vcpkg.exe install curl:x64-windows sdl2:x64-windows
+```
+
+After installation, ensure `vcpkg\installed\x64-windows\bin` is on your
+`PATH` so the resulting `HFT_Orderbook.exe` can locate the required DLLs.
+
 ## Prebuilt binaries
 
 Every push and pull request triggers a GitHub Actions workflow that builds the

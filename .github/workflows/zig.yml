@@ -32,18 +32,16 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          choco install -y curl
-          $curlRoot = Get-ChildItem "$env:ProgramData\chocolatey\lib\curl\tools" | Select-Object -First 1
-          $curlInc = Join-Path $curlRoot.FullName 'include'
-          $curlLib = Join-Path $curlRoot.FullName 'lib'
-          $sdlVersion = '2.28.5'
-          Invoke-WebRequest -Uri "https://github.com/libsdl-org/SDL/releases/download/release-$sdlVersion/SDL2-devel-$sdlVersion-VC.zip" -OutFile SDL2.zip
-          Expand-Archive SDL2.zip -DestinationPath SDL2
-          $sdlPath = Join-Path (Get-Location) "SDL2/SDL2-$sdlVersion"
-          "$sdlPath\lib\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          "$curlRoot.FullName\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          "INCLUDE=$sdlPath\include;$curlInc;$env:INCLUDE" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "LIB=$sdlPath\lib\x64;$curlLib;$env:LIB" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+          .\vcpkg\vcpkg.exe install curl:x64-windows sdl2:x64-windows
+          $root = Resolve-Path .\vcpkg
+          $inc  = Join-Path $root 'installed\x64-windows\include'
+          $lib  = Join-Path $root 'installed\x64-windows\lib'
+          $bin  = Join-Path $root 'installed\x64-windows\bin'
+          "$bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "INCLUDE=$inc;$env:INCLUDE" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "LIB=$lib;$env:LIB" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Install Zig
         uses: mlugg/setup-zig@v1
