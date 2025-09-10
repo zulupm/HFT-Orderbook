@@ -22,6 +22,13 @@ zig build benchmark  # executes benchmark with 100000 operations
 The benchmark output prints the average time per operation in microseconds and
 the achieved throughput in operations per second.
 
+## Dependencies
+
+The Zig build uses `pkg-config` to discover `libcurl` and `SDL2` on Unix-like
+systems. Make sure the corresponding development packages and `pkg-config` are
+installed (for example, `libcurl4-openssl-dev` and `libsdl2-dev` on
+Debian/Ubuntu) before running `zig build`.
+
 ## Binance Order Book Snapshot
 
 The executable can fetch a live ETH/USDT order book snapshot from Binance using
