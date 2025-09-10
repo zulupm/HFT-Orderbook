@@ -62,14 +62,23 @@ pub fn build(b: *std.Build) void {
     exe.linkLibC();
     exe.linkLibCpp();
     if (target.os_tag == .windows) {
-        // Fallback to vcpkg-installed headers and libraries when present
-        exe.addIncludePath(.{ .path = "vcpkg/installed/x64-windows/include" });
-        exe.addLibraryPath(.{ .path = "vcpkg/installed/x64-windows/lib" });
+        // Fallback to vcpkg-installed headers and static libraries when present
+        exe.addIncludePath(.{ .path = "vcpkg/installed/x64-windows-static/include" });
+        exe.addLibraryPath(.{ .path = "vcpkg/installed/x64-windows-static/lib" });
         addEnvPaths(b, exe, "INCLUDE", false);
         addEnvPaths(b, exe, "LIB", true);
-        exe.linkSystemLibrary("curl");
-        exe.linkSystemLibrary("SDL2");
-        exe.linkSystemLibrary("SDL2main");
+        const opts = .{ .preferred_link_mode = .Static };
+        exe.linkSystemLibrary2("curl", opts);
+        exe.linkSystemLibrary2("SDL2", opts);
+        exe.linkSystemLibrary2("SDL2main", opts);
+        exe.linkSystemLibrary("ws2_32");
+        exe.linkSystemLibrary("crypt32");
+        exe.linkSystemLibrary("bcrypt");
+    } else if (target.os_tag == .macos) {
+        const opts = .{ .preferred_link_mode = .Static };
+        exe.linkSystemLibrary2("curl", opts);
+        exe.linkSystemLibrary2("SDL2", opts);
+        if (link_math) exe.linkSystemLibrary("m");
     } else {
         exe.linkSystemLibrary("curl");
         exe.linkSystemLibrary("SDL2");
