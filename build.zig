@@ -1,5 +1,17 @@
 const std = @import("std");
 
+fn addEnvPaths(b: *std.Build, exe: *std.Build.Step.Compile, env: []const u8, is_lib: bool) void {
+    const raw = std.process.getEnvVarOwned(b.allocator, env) catch return;
+    defer b.allocator.free(raw);
+    var it = std.mem.splitScalar(u8, raw, ';');
+    while (it.next()) |seg| {
+        if (seg.len == 0) continue;
+        const p = b.dupe(seg);
+        if (is_lib) exe.addLibraryPath(.{ .path = p })
+        else exe.addIncludePath(.{ .path = p });
+    }
+}
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -49,9 +61,17 @@ pub fn build(b: *std.Build) void {
     exe.addCSourceFile(.{ .file = .{ .path = "src/testCases.c" }, .flags = &[_][]const u8{} });
     exe.linkLibC();
     exe.linkLibCpp();
-    exe.linkSystemLibrary("curl");
-    exe.linkSystemLibrary("SDL2");
-    if (link_math) exe.linkSystemLibrary("m");
+    if (target.os_tag == .windows) {
+        addEnvPaths(b, exe, "INCLUDE", false);
+        addEnvPaths(b, exe, "LIB", true);
+        exe.linkSystemLibrary("libcurl");
+        exe.linkSystemLibrary("SDL2");
+        exe.linkSystemLibrary("SDL2main");
+    } else {
+        exe.linkSystemLibrary("curl");
+        exe.linkSystemLibrary("SDL2");
+        if (link_math) exe.linkSystemLibrary("m");
+    }
     b.installArtifact(exe);
 
     const test_step = b.step("test", "Run C unit tests");
