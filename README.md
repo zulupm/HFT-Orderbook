@@ -11,27 +11,35 @@ https://goo.gl/KF1SRm
 
 ## Performance Benchmark
 
-A simple benchmark is provided to measure mean latency and throughput of basic
-order operations. Build and run it with the Zig toolchain:
+A built-in benchmark reports mean latency and throughput for order operations.
+Build the project and run the benchmark using Zig:
 
 ```
-zig build
-zig build benchmark        # debug build
-zig build -Doptimize=ReleaseFast benchmark  # optimized benchmark
+zig build            # builds the unified HFT_Orderbook binary
+zig build benchmark  # executes benchmark with 100000 operations
 ```
 
-The `benchmark` step executes the harness with 100000 operations and reports
-the average time per operation in microseconds along with the achieved
-throughput in operations per second. The resulting executables are placed in
-`zig-out/bin/` and can also be run directly, e.g. `zig-out/bin/orderbook_benchmark 100000`.
+The benchmark output prints the average time per operation in microseconds and
+the achieved throughput in operations per second.
+
+## Binance Order Book Snapshot
+
+The executable can fetch a live ETH/USDT order book snapshot from Binance using
+`libcurl`.
+
+```
+./build/HFT_Orderbook --binance-snapshot [SYMBOL]
+```
+
+The program prints the top bid and ask from the returned snapshot, verifying
+connectivity to the exchange.
 
 ## Prebuilt binaries
 
 Every push and pull request triggers a GitHub Actions workflow that builds the
 project on Linux, macOS and Windows using Zig 0.11.0. The compiled
-`HFT_Orderbook` and `orderbook_benchmark` executables are published as workflow
-artifacts and can be downloaded from the Actions run page for your platform of
-choice.
+`HFT_Orderbook` executable is published as a workflow artifact for easy
+download.
 
 
     "There are three main operations that a limit order book (LOB) has to

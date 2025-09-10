@@ -19,14 +19,10 @@ static double now(void) {
 }
 #endif
 
-int main(int argc, char *argv[]){
-    long iterations = 100000;
-    if (argc > 1) {
-        iterations = strtol(argv[1], NULL, 10);
-        if (iterations <= 0) {
-            printf("Invalid iteration count.\n");
-            return 1;
-        }
+void run_benchmark(long iterations) {
+    if (iterations <= 0) {
+        printf("Invalid iteration count.\n");
+        return;
     }
 
     Limit limit;
@@ -50,5 +46,4 @@ int main(int argc, char *argv[]){
     printf("Performed %ld operations in %f seconds\n", iterations, elapsed);
     printf("Average latency per operation: %.3f microseconds\n", latency_us);
     printf("Throughput: %.3f ops/sec\n", throughput);
-    return 0;
 }

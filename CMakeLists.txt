@@ -11,23 +11,13 @@ set(SOURCE_FILES
         src/bst.c
         src/utils.c
         src/main.c
+        src/benchmark.c
+        src/binance.cpp
         src/CuTest.h
         src/CuTest.c
-        src/testCases.c
-        LICENSE
-        lob.py
-        orderbook_tests.py
-        README.md)
+        src/testCases.c)
 
 add_executable(HFT_Orderbook ${SOURCE_FILES})
-
-# Benchmark executable for measuring latency and throughput
-add_executable(orderbook_benchmark
-        src/performance.c
-        src/datastructs.c
-        src/limits.c
-        src/orders.c
-        src/bst.c
-        src/utils.c)
+target_link_libraries(HFT_Orderbook curl)
 
 set(CMAKE_BUILD_TYPE Debug)

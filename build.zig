@@ -27,27 +27,15 @@ pub fn build(b: *std.Build) void {
         exe.addCSourceFile(.{ .file = .{ .path = src_file }, .flags = &[_][]const u8{} });
     }
     exe.addCSourceFile(.{ .file = .{ .path = "src/main.c" }, .flags = &[_][]const u8{} });
+    exe.addCSourceFile(.{ .file = .{ .path = "src/benchmark.c" }, .flags = &[_][]const u8{} });
+    exe.addCSourceFile(.{ .file = .{ .path = "src/binance.cpp" }, .flags = &[_][]const u8{"-std=c++17"} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/CuTest.c" }, .flags = &[_][]const u8{} });
     exe.addCSourceFile(.{ .file = .{ .path = "src/testCases.c" }, .flags = &[_][]const u8{} });
     exe.linkLibC();
+    exe.linkLibCpp();
+    exe.linkSystemLibrary("curl");
     if (link_math) exe.linkSystemLibrary("m");
     b.installArtifact(exe);
-
-    const bench = b.addExecutable(.{
-        .name = "orderbook_benchmark",
-        .target = target,
-        .optimize = optimize,
-    });
-    for (include_paths) |p| {
-        bench.addIncludePath(.{ .path = p });
-    }
-    for (common_sources) |src_file| {
-        bench.addCSourceFile(.{ .file = .{ .path = src_file }, .flags = &[_][]const u8{} });
-    }
-    bench.addCSourceFile(.{ .file = .{ .path = "src/performance.c" }, .flags = &[_][]const u8{} });
-    bench.linkLibC();
-    if (link_math) bench.linkSystemLibrary("m");
-    b.installArtifact(bench);
 
     const test_step = b.step("test", "Run C unit tests");
     const run_tests = b.addRunArtifact(exe);
@@ -55,7 +43,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_tests.step);
 
     const bench_step = b.step("benchmark", "Run performance benchmark");
-    const run_bench = b.addRunArtifact(bench);
-    run_bench.addArg("100000");
+    const run_bench = b.addRunArtifact(exe);
+    run_bench.addArgs(&[_][]const u8{"--benchmark", "100000"});
     bench_step.dependOn(&run_bench.step);
 }
