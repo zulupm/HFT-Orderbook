@@ -21,4 +21,13 @@ set(SOURCE_FILES
 
 add_executable(HFT_Orderbook ${SOURCE_FILES})
 
+# Benchmark executable for measuring latency and throughput
+add_executable(orderbook_benchmark
+        src/performance.c
+        src/datastructs.c
+        src/limits.c
+        src/orders.c
+        src/bst.c
+        src/utils.c)
+
 set(CMAKE_BUILD_TYPE Debug)

@@ -9,6 +9,30 @@ Available at Archive.org's WayBackMachine:
 
 https://goo.gl/KF1SRm
 
+## Performance Benchmark
+
+A simple benchmark is provided to measure mean latency and throughput of basic
+order operations. Build and run it with the Zig toolchain:
+
+```
+zig build
+zig build benchmark        # debug build
+zig build -Doptimize=ReleaseFast benchmark  # optimized benchmark
+```
+
+The `benchmark` step executes the harness with 100000 operations and reports
+the average time per operation in microseconds along with the achieved
+throughput in operations per second. The resulting executables are placed in
+`zig-out/bin/` and can also be run directly, e.g. `zig-out/bin/orderbook_benchmark 100000`.
+
+## Prebuilt binaries
+
+Every push and pull request triggers a GitHub Actions workflow that builds the
+project on Linux, macOS and Windows using Zig 0.11.0. The compiled
+`HFT_Orderbook` and `orderbook_benchmark` executables are published as workflow
+artifacts and can be downloaded from the Actions run page for your platform of
+choice.
+
 
     "There are three main operations that a limit order book (LOB) has to
     implement: add, cancel, and execute.  The goal is to implement these
